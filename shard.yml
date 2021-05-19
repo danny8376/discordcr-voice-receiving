@@ -1,0 +1,13 @@
+name: discordcr-voice-receiving
+version: 0.1.0
+
+authors:
+  - DannyAAM <danny@saru.moe>
+
+dependencies:
+  discordcr:
+    github: shardlab/discordcr
+
+crystal: 1.0.0
+
+license: MIT
