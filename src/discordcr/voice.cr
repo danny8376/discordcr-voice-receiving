@@ -5,8 +5,6 @@ module Discord
     @ssrc_user_map = Hash(UInt32, Snowflake).new
 
     def on_receiving(&handler : Bytes, Snowflake?, UInt16, UInt32 ->) # should be called after ready
-      # override existing ws on message for receiving
-      @websocket.on_message(&->voice_receiving_ws_on_message(Discord::WebSocket::Packet))
       # start receiving voice data, spawn a thread to loop it
       spawn do
         loop do
@@ -24,14 +22,16 @@ module Discord
       end
     end
 
-    def voice_receiving_ws_on_message(packet : Discord::WebSocket::Packet)
+    def on_message(packet : Discord::WebSocket::Packet)
       case packet.opcode
       when OP_SPEAKING
+        Log.debug { "(voice-receving) VWS packet received: #{packet} #{packet.data.to_s}" }
+
         payload = VWS::SpeakingPayload.from_json(packet.data)
         @ssrc_user_map[payload.ssrc] = payload.user_id
         #on_speaking(payload)
       else
-        on_message(packet)
+        previous_def # run original definition
       end
     end
   end
